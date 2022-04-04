@@ -1,5 +1,12 @@
 export interface Articulo {
-    id: number | null;
+    id: number;
+    codigo: string;
+    nombre: string;
+    descripcion: string;
+    cantidad: number
+}
+
+export interface ArticuloModify {
     codigo: string;
     nombre: string;
     descripcion: string;
@@ -11,8 +18,7 @@ export interface Mensaje {
     clase: string
 }
 
-export const defaulltArticulo : Articulo = {
-    id: null,
+export const defaulltArticulo : ArticuloModify = {
     codigo: '',
     nombre: '',
     descripcion: '',

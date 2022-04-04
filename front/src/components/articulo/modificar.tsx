@@ -1,22 +1,54 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { Articulo, Mensaje, defaulltArticulo } from '../types';
+import { ArticuloModify, Mensaje, defaulltArticulo } from '../types';
+import clientAxios from '../../config/axios';
 
 import './articulo.css';
 
 const Modificar = () => {
     
-    const [articulo, modificarArticulo] = useState<Articulo>(defaulltArticulo);
+    const [articulo, modificarArticulo] = useState<ArticuloModify>(defaulltArticulo);
     const [mensaje, modificarMensaje] = useState<Mensaje | undefined>();
 
     let navigate = useNavigate();
 
-    const enviar = (e : any) => {
+    const establecerAlerta = (mensaje: string, clase: string) => {
+        modificarMensaje({
+            clase, 
+            mensaje
+        });
+        setTimeout( () => {
+            modificarMensaje(undefined);
+        }, 5000);
+    }
+
+    const enviar = async (e : any) => {
         e.preventDefault();
-        // Validar que el codigo este en la base de datos
-        
-        
+
+        // Checkeo que codigo no se encuentre vacio
+        if (articulo.codigo.length == 0) {
+            establecerAlerta("El campo codigo no puede estar vacio", "mensaje-error")
+            return;
+        }
+
+        try {
+            let uri = `/api/Articulos/${articulo.codigo}`;
+            await clientAxios.put<ArticuloModify[]>(uri, articulo)
+                .then((response : any) => {
+                    modificarArticulo(response.data);
+                });
+
+        } catch (error : any) {
+            if (error.response.status == 404) {
+                establecerAlerta('El codigo no se encuentra registrado','mensaje-error');
+            } else {
+                establecerAlerta('Hubo un error en la comunicacion con el servidor','mensaje-error');
+            }
+            return;
+        }
+
         // Ir a splash
+        modificarMensaje(undefined);
         navigate('/');
     }
 
@@ -32,7 +64,7 @@ const Modificar = () => {
             <div className='row'>
                 <h1 className='text-center mb-5'>Modificar articulo</h1>
             </div>
-            {mensaje ? <p className={mensaje.clase}>{mensaje.mensaje}</p> : null}
+            {mensaje ? <p className={`text-center ${mensaje.clase}`}>{mensaje.mensaje}</p> : null}
             <div className='row'>
             <div className='col-md-1 col-lg-2' />
             <form className='col-md-10 col-lg-8 caja'>

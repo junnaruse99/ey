@@ -1,18 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ListaArticulo from './listaArticulo';
-import { Articulo } from '../types';
 import { Link } from 'react-router-dom';
+import clientAxios from '../../config/axios';
+import { Mensaje, Articulo } from '../types';
 
 import './splash.css';
 
-// TODO: Cambiar el path
-let articulos : Articulo[] = require('../../articulos.json');
-
-
+// Data de prueba
+// let articulos : Articulo[] = require('../../articulos.json');
 
 const Splash = () => {
+
+    useEffect(() => {
+        getArticulos();
+    }, []);
+
+    const [mensaje, modificarMensaje] = useState<Mensaje | undefined>();
+    const [articulos, modificarArticulos] = useState<Articulo[]>([]);
+    
+    const getArticulos = async () => {
+        try {
+            let uri = '/api/Articulos';
+            await clientAxios.get<Articulo[]>(uri)
+                .then((response : any) => {
+                    console.log(response);
+                    modificarArticulos(response.data);
+                });
+
+        } catch (error) {
+            modificarMensaje({
+                mensaje: 'Hubo un error en la comunicacion con el servidor',
+                clase: 'mensaje-error'
+            })
+            console.log(error)
+        }
+    }
+
     return (
         <div className='container mt-5 mb-5'>
+            {mensaje ? <p className={`text-center ${mensaje.clase}`}>{mensaje.mensaje}</p> : null}
+
             <div className='row'>
             <table className="table">
                 <thead>
