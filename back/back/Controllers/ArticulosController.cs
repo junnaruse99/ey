@@ -24,8 +24,12 @@ namespace back.Controllers
 
         // GET: api/Articulos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Articulos>>> GetArticulos()
+        public async Task<ActionResult<IEnumerable<Articulos>>> GetArticulos(int pagina)
         {
+            //if (pagina is 0) {
+            //    return Ok(await _context.Articulos.CountAsync());
+            //}
+
             return await _context.Articulos.ToListAsync();
         }
 
